@@ -1,14 +1,16 @@
+// src/users/entities/user.entity.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Schema()
-export class User {
-  @Prop()
+@Schema({ timestamps: true })
+export class User extends Document {
+  @Prop({ required: true })
   name: string;
 
-  @Prop({ unique: true })
+  @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop()
+  @Prop({ required: true })
   password: string;
 }
 
