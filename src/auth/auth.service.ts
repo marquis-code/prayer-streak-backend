@@ -40,24 +40,59 @@ export class AuthService {
     return { token };
   }
 
+  // async login(loginDto: LoginDto) {
+  //   const { email, password } = loginDto;
+  //   const user = await this.userModel.findOne({
+  //     email,
+  //   });
+
+  //   if (!user) throw new UnauthorizedException('invalid email or password');
+
+  //   const passwordMatch = await bcrypt.compare(password, user.password);
+  //   if (!passwordMatch)
+  //     throw new UnauthorizedException('invalid email or password');
+
+  //   const token = await this.jwtService.sign(
+  //     { id: user.id },
+  //     {
+  //       secret: this.configService.get('JWT_SECRET'),
+  //     },
+  //   );
+  //   return { token };
+  // }
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
-    const user = await this.userModel.findOne({
-      email,
-    });
-
-    if (!user) throw new UnauthorizedException('invalid email or password');
-
+  
+    // Find the user by email
+    const user = await this.userModel.findOne({ email });
+  
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+  
+    // Check if the password matches
     const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch)
-      throw new UnauthorizedException('invalid email or password');
-
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+  
+    // Generate a JWT token
     const token = await this.jwtService.sign(
       { id: user.id },
       {
         secret: this.configService.get('JWT_SECRET'),
       },
     );
-    return { token };
+  
+    // Convert user to an object and remove the password field
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+  
+    // Return the user object along with the token
+    return {
+      token,
+      user: userWithoutPassword,
+    };
   }
+  
 }
