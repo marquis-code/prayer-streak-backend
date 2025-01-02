@@ -125,6 +125,11 @@ export class StreakService {
     job.start();
   }
 
+  async notifyUser(streakId: string, userId: string) {
+    const message = `Streak ${streakId} has been updated for user ${userId}.`;
+    this.gateway.sendNotificationToClient(message);
+  }
+
   public testSchedulePrayerReminder(id: string) {
     this.streakModel.findById(id).then(streak => {
       if (streak) {
